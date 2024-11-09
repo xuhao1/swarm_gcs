@@ -277,6 +277,35 @@ class SwarmCommander extends BaseCommander{
         });
     }
 
+    setup_mavlink_on_udp(port=14550) {
+        // Use UDP to receive mavlink message, setup the callback function
+        // Setup UDP listener
+        var dgram = require('dgram');
+        let self = this;
+        this.udp_server = dgram.createSocket('udp4');
+        this.udp_server.bind(port, function() {
+            console.log("UDP server bind on port", port);
+        }
+        );
+        this.udp_server.on('message', function(msg, rinfo) {
+            let msgs = self.mav.parseBuffer(msg);
+            for (var k in msgs) {
+                let msg = msgs[k];
+                switch (msg.name) {
+                    case "NODE_REALTIME_INFO": {
+                        self.on_drone_realtime_info_recv(0, msg.lps_time, msg);
+                        break;
+                    }
+                    case "DRONE_STATUS": {
+                        self.on_drone_status_recv(0, msg.lps_time, msg);
+                        break;
+                    }
+                }
+            }
+        });
+    }
+           
+
     on_grid(msg) {
         console.log(msg);
         var ns = msg.ns + msg.id;
@@ -511,34 +540,39 @@ class SwarmCommander extends BaseCommander{
 
     send_simple_move(_id){
         console.log("Send simple move");
-        var msg = {
-            header: {
-                frame_id: "world",
-                stamp: this.rosnodejs.Time.now()
-            },
-            pose: {
-                position: {
-                    x: 0,
-                    y: 0,
-                    z: 0,
+        try{
+            var msg = {
+                header: {
+                    frame_id: "world",
+                    stamp: this.rosnodejs.Time.now()
                 },
-                orientation: {
-                    w: 1,
-                    x: 0, 
-                    y: 0, 
-                    z: 0
+                pose: {
+                    position: {
+                        x: 0,
+                        y: 0,
+                        z: 0,
+                    },
+                    orientation: {
+                        w: 1,
+                        x: 0, 
+                        y: 0, 
+                        z: 0
+                    }
                 }
+            };
+
+            if (this.nodejs) {
+                this.move_simple_goal.publish(msg);
+            } else {
+                var _msg = new ROSLIB.Message(msg);
+                this.move_simple_goal.publish(_msg);
             }
-        };
 
-        if (this.nodejs) {
-            this.move_simple_goal.publish(msg);
-        } else {
-            var _msg = new ROSLIB.Message(msg);
-            this.move_simple_goal.publish(_msg);
+            var exp_cmd = 30;
         }
-
-        var exp_cmd = 30;
+        catch(e){
+            console.log(e);
+        }
 
         let scmd = new mavlink.messages.swarm_remote_command (this.lps_time, _id, exp_cmd, 
             0, 
@@ -630,19 +664,23 @@ class SwarmCommander extends BaseCommander{
 
     send_msg_to_swarm(_msg) {
         let _data = _msg.pack(this.mav);
-        if (this.nodejs) {
-            this.send_uwb_msg.publish({
-                header: {
-                    frame_id: "world",
-                    stamp: this.rosnodejs.Time.now()
-                },
-                data : _data,
-                send_method: 2,
-            });
-            console.log("Publishing via nodejs", _data);
-        } else {
-            var msg = new ROSLIB.Message({data : _data, send_method: 2});
-            this.send_uwb_msg.publish(msg);
+        try {
+            if (this.nodejs) {
+                this.send_uwb_msg.publish({
+                    header: {
+                        frame_id: "world",
+                        stamp: this.rosnodejs.Time.now()
+                    },
+                    data : _data,
+                    send_method: 2,
+                });
+                console.log("Publishing via nodejs", _data);
+            } else {
+                var msg = new ROSLIB.Message({data : _data, send_method: 2});
+                this.send_uwb_msg.publish(msg);
+            }
+        } catch (e) {
+            console.log(e);
         }
     }
 

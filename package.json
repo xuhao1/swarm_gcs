@@ -6,6 +6,7 @@
   "scripts": {
     "start": "electron ."
   },
+  "type": "module",
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
     "Electron",
@@ -23,8 +24,9 @@
     "underscore": "^1.9.1"
   },
   "dependencies": {
-    "rosnodejs": "^3.0.2",
     "jspack": "0.0.4",
+    "rosnodejs": "^3.0.2",
+    "three": "^0.170.0",
     "underscore": "^1.9.1"
   }
 }

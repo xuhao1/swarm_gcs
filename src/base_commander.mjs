@@ -21,8 +21,15 @@ class BaseCommander {
         this.setup_ros_sub_pub_nodejs();
       }
       catch (e){
-        console.error("Could not initialize nodejs", e, ", use websocket interface");
+        console.error("Could not initialize rosnodejs:", e, "\n use websocket interface instead");
         this.setup_ros_conn();
+      }
+      try {
+        this.setup_mavlink_on_udp(14550);
+        ui.set_ros_conn("UDP");
+      }
+      catch (e) {
+        console.error("Could not initialize mavlink on udp", e);
       }
 
       this.connected = false;
@@ -33,6 +40,10 @@ class BaseCommander {
   }
 
   setup_ros_sub_pub_websocket() {
+    console.log("Not implement yet");
+  }
+
+  setup_mavlink_on_udp(port=14450) {
     console.log("Not implement yet");
   }
 

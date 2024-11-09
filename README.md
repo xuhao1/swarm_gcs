@@ -31,6 +31,13 @@ $cd ~/path-to-swarm_gcs/
 $electron . #Let nodejs inside swarm_gcs connect to ros!
 ```
 
+## Testing
+To test the swarm_gcs in this mode, you may use the following command 
+
+```bash
+python3 emulator_for_gcs/main.py
+```
+
 Way 0: Second convient way:
 
 ```
@@ -133,4 +140,3 @@ cd swarm_gcs
 http-server -c-1
 ```
 Then open http://127.0.0.1:8080 in Chrome
-
