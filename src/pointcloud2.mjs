@@ -17,7 +17,7 @@ function tnow() {
   return new Date().getTime() / 1000;
 }
 
-import * as THREE from "../third_party/three.js/build/three.module.js";
+import * as THREE from "../third_party/three.js/build/three.webgpu.js";
 
 
 function decode64(inbytes, outbytes, record_size, pointRatio) {
@@ -234,7 +234,7 @@ class PointCloud2 {
   }
 
   boxes_object() {
-    var bufferGeometry = new THREE.BoxBufferGeometry(this.grid_size, this.grid_size, this.grid_size );
+    var bufferGeometry = new THREE.BoxGeometry(this.grid_size, this.grid_size, this.grid_size );
     var geometry = new THREE.InstancedBufferGeometry();
     geometry.index = bufferGeometry.index;
     geometry.attributes.position = bufferGeometry.attributes.position;

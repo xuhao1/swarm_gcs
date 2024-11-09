@@ -1,18 +1,17 @@
-
-import * as THREE from "../third_party/three.js/build/three.module.js";
+import * as THREE from 'three';
 import { OrbitControls } from '../libs/OrbitControlsiPad.js';
-import { ThreeMFLoader } from '../third_party/three.js/examples/jsm/loaders/3MFLoader.js';
-
-import { OBJLoader } from '../third_party/three.js/examples/jsm/loaders/OBJLoader.js';
-import { MTLLoader } from '../third_party/three.js/examples/jsm/loaders/MTLLoader.js';
-// import { MtlObjBridge } from "../third_party/three.js/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js";
+import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+// import { MtlObjBridge } from "three/addons/loaders/obj2/bridge/MtlObjBridge.js";
 import Stats from '../libs/stats.module.js';
-import { EffectComposer } from '../third_party/three.js/examples/jsm/postprocessing/EffectComposer.js';
-import { OutlinePass } from '../third_party/three.js/examples/jsm/postprocessing/OutlinePass.js';
-import { RenderPass } from '../third_party/three.js/examples/jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from '../third_party/three.js/examples/jsm/postprocessing/ShaderPass.js';
-import { FXAAShader } from '../third_party/three.js/examples/jsm/shaders/FXAAShader.js';
-import { TransformControls } from '../third_party/three.js/examples/jsm/controls/TransformControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
 import { SelectionBox } from './UAVSelectionBox.js';
 import { SelectionHelper } from './SelectionHelper.js';
@@ -122,7 +121,7 @@ class ThreeView {
             obj.toggle_rangeselect(!obj.enable_rangeselect);
         });
 
-        this.scene.add(this.transform_control);
+        // this.scene.add(this.transform_control);
 
         this.init_scene();
 
@@ -187,7 +186,7 @@ class ThreeView {
 
         this.last_render_ts = new Date().getTime() / 1000;
 
-        var loader = new THREE.FontLoader();
+        var loader = new FontLoader();
 
         loader.load('fonts/helvetiker_regular.typeface.json', function (font) {
             console.log(obj.font)
@@ -993,7 +992,7 @@ class ThreeView {
     }
 
     create_wp_object(_id) {
-        var geometry = new THREE.BoxBufferGeometry(0.001, 0.001, 0.001);
+        var geometry = new THREE.BoxGeometry(0.001, 0.001, 0.001);
         var object;
         this.uav_waypoint_targets[_id] = object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff }));
         this.scene.add(object);
@@ -1032,7 +1031,6 @@ class ThreeView {
         object.position.y = pos.y;
         object.position.z = pos.z;
 
-        // this.transform_control.attach(object);
         this.set_waypoint_helper_position(pos);
     }
 

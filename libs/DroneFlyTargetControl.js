@@ -3,7 +3,7 @@
  */
 
 import {
-	BoxBufferGeometry,
+	BoxGeometry,
 	BufferGeometry,
 	Color,
 	CylinderBufferGeometry,
@@ -25,7 +25,7 @@ import {
 	SphereBufferGeometry,
 	TorusBufferGeometry,
 	Vector3
-} from "../third_party/three.js/build/three.module.js";
+} from "../third_party/three.js/build/three.webgpu.js";
 
 var TransformControls = function ( camera, domElement ) {
 
@@ -760,7 +760,7 @@ var TransformControlsGizmo = function () {
 
 	var arrowGeometry = new CylinderBufferGeometry( 0, 0.05, 0.2, 12, 1, false );
 
-	var scaleHandleGeometry = new BoxBufferGeometry( 0.125, 0.125, 0.125 );
+	var scaleHandleGeometry = new BoxGeometry( 0.125, 0.125, 0.125 );
 
 	var lineGeometry = new BufferGeometry( );
 	lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
@@ -955,13 +955,13 @@ var TransformControlsGizmo = function () {
 			[ new Line( lineGeometry, matLineMagenta ), [ 0.98, 0, 0.855 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
 		],
 		XYZX: [
-			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 1.1, 0, 0 ]],
+			[ new Mesh( new BoxGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 1.1, 0, 0 ]],
 		],
 		XYZY: [
-			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 1.1, 0 ]],
+			[ new Mesh( new BoxGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 1.1, 0 ]],
 		],
 		XYZZ: [
-			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 0, 1.1 ]],
+			[ new Mesh( new BoxGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 0, 1.1 ]],
 		]
 	};
 
@@ -985,13 +985,13 @@ var TransformControlsGizmo = function () {
 			[ new Mesh( scaleHandleGeometry, matInvisible ), [ 0.85, 0, 0.85 ], null, [ 3, 0.2, 3 ]],
 		],
 		XYZX: [
-			[ new Mesh( new BoxBufferGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 1.1, 0, 0 ]],
+			[ new Mesh( new BoxGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 1.1, 0, 0 ]],
 		],
 		XYZY: [
-			[ new Mesh( new BoxBufferGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 1.1, 0 ]],
+			[ new Mesh( new BoxGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 1.1, 0 ]],
 		],
 		XYZZ: [
-			[ new Mesh( new BoxBufferGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 0, 1.1 ]],
+			[ new Mesh( new BoxGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 0, 1.1 ]],
 		]
 	};
 

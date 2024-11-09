@@ -317,7 +317,14 @@
       </div>
   <div class="drone_id" v-for="(_, _id) in uav_screen_pos"  v-bind:style="{ top: uav_screen_pos[_id].y, left: uav_screen_pos[_id].x, position: 'fixed', color:uav_label_colors[_id]}">{{_id}}</div>
   </div>
-
+  <script type="importmap">
+			{
+				"imports": {
+					"three": "./third_party/three.js/build/three.module.js",
+					"three/addons/": "./third_party/three.js/examples/jsm/"
+				}
+			}
+		</script>
   <script type="module">
     import { SwarmCommander } from './src/swarm_commander.mjs';
     import { SwarmGCSUI } from "./src/gcs_view.mjs";
