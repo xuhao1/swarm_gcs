@@ -2,7 +2,7 @@
 # If argument1 is launch: to launch all nodes, else may in exec mode
 
 source /root/gcs_ws/devel/setup.bash
-eval "$(fnm env --shell=bash)"
+eval "$(/root/.local/share/fnm/fnm env --shell=bash)"
 echo "Launching with argument $1"
 if [ "$1" == "launch" ]; then
     echo "Launching GCS"
