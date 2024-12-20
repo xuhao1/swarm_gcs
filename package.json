@@ -4,7 +4,8 @@
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "web": "http-server -p 8080 -c-1"
   },
   "type": "module",
   "repository": "https://github.com/electron/electron-quick-start",
@@ -18,13 +19,13 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^16.0.7",
-    "jspack": "0.0.4",
+    "electron": "^16.2.8",
+    "jspack": "^0.0.4",
     "rosnodejs": "^3.0.2",
     "underscore": "^1.9.1"
   },
   "dependencies": {
-    "jspack": "0.0.4",
+    "jspack": "^0.0.4",
     "rosnodejs": "^3.0.2",
     "three": "^0.170.0",
     "underscore": "^1.9.1"
