@@ -73,6 +73,7 @@ class SwarmGCSUI {
                 loop_mode: loop_mode? "ON": "OFF",
                 primary_id: this.primary_id,
                 server_ip: opt.server_ip,
+                server_ip_input: '',
                 is_wrap_swarm: false,
                 rc:[0.0, 0.0, 0.0, 0.0],//AETR
                 formation_class : {

@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "jspack": "^0.0.4",
-    "rc": "^1.2.8",
     "rosnodejs": "^3.0.2",
     "three": "^0.170.0",
     "underscore": "^1.9.1"
