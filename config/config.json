@@ -3,5 +3,8 @@
         "chessboard": false,
         "grid": true
     },
-    "server_ip": "127.0.0.1"
+    "server_ip": "127.0.0.1",
+    "landing_speed": 0.2,
+    "takeoff_speed": 0.6,
+    "takeoff_height": 1.5
 }
