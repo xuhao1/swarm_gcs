@@ -177,16 +177,36 @@
           </li>
 
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-              aria-haspopup="true" aria-expanded="false">
-              SERVER:{{server_ip}}
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <!-- <a class="dropdown-item" href="#" v-on:click="set_server_ip('127.0.0.1')">LOCALHOST</a> -->
-              <a class="dropdown-item" href="#" v-for="(_ip, _i) in server_ip_list"
-                v-on:click="set_server_ip(_ip)">{{_ip}}</a>
-            </div>
-          </li>
+  <a
+    class="nav-link dropdown-toggle"
+    href="#"
+    id="navbarDropdown"
+    role="button"
+    data-toggle="dropdown"
+    aria-haspopup="true"
+    aria-expanded="false"
+  >
+    SERVER: {{ server_ip }}
+  </a>
+
+  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+    <form class="px-3 py-2" @submit.prevent="set_server_ip(server_ip_input)">
+      <input
+        type="text"
+        class="form-control"
+        v-model="server_ip_input"
+        placeholder="请输入 IP 地址"
+      />
+      <button
+        class="btn btn-sm btn-primary mt-2"
+        type="submit"
+      >
+        设置
+      </button>
+    </form>
+  </div>
+</li>
+
 
           <li class="nav-item">
             <a class="nav-link disabled lps_time" href="#" tabindex="-1" aria-disabled="true"
@@ -326,12 +346,26 @@
 			}
 		</script>
   <script type="module">
+    var conf = {
+      opt_3d:{
+        chessboard:false,
+        grid: true
+      },
+      server_ip: "127.0.0.1",
+    };
+    // Blocking Load config from ./config/config.json and merge with default config
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "./config/config.json", false);
+    xhr.send();
+    if (xhr.status === 200) {
+      var config = JSON.parse(xhr.responseText);
+      conf = Object.assign(conf, config);
+    }
+    console.log("Config:", conf);
+    
     import { SwarmCommander } from './src/swarm_commander.mjs';
     import { SwarmGCSUI } from "./src/gcs_view.mjs";
-    var ui = new SwarmGCSUI({}, {
-      chessboard:false,
-      grid: true
-    });
+    var ui = new SwarmGCSUI({}, conf);
     // console.log(ui);
     var sc = new SwarmCommander(ui);
     window.ui = ui;

@@ -89,9 +89,6 @@ class BaseCommander {
             self.connected = false;
             self.vicon_subs = {};
             ros.close();
-            setTimeout(() => {
-                // _ui.select_next_server_ip();
-            }, (500));
         });
         
         ros.on('close', function() {
@@ -100,9 +97,6 @@ class BaseCommander {
             self.connected = false;
             ros.close();
             self.vicon_subs = {};
-            setTimeout(() => {
-                // _ui.select_next_server_ip();
-            }, (500));
         });
     }
     catch (error) {
@@ -110,10 +104,6 @@ class BaseCommander {
         _ui.set_ros_conn("ERROR");
         self.connected = false;
         self.vicon_subs = {};
-        setTimeout(() => {
-            // _ui.select_next_server_ip();
-        }, (500));
-
       }
   }
 

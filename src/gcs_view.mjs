@@ -24,19 +24,17 @@ let uav_label_colors = {
 }
 
 class SwarmGCSUI {
-    constructor(opt_ui, opt_3d) {
+    constructor(opt_ui, opt) {
         let obj = this;
        
         this.select_id = -1;
         this.warn_count = 0;
         this.last_speak_time = tnow() - 10;
 
-
+        this.opt = opt;
         this.count = 0;
 
         this.server_ip = location.hostname;
-        this.server_ip_index = -1;
-        this.server_ip_list = ["192.168.0.100", "127.0.0.1", location.hostname,  "10.10.1.10"];
         this.display_pcl = true;
         this.low_bat_time = 60;
         
@@ -73,9 +71,8 @@ class SwarmGCSUI {
                 marker_path:"",
                 display_mode:_dis_mode,
                 loop_mode: loop_mode? "ON": "OFF",
-                primary_id:this.primary_id,
-                server_ip: this.server_ip,
-                server_ip_list: this.server_ip_list,
+                primary_id: this.primary_id,
+                server_ip: opt.server_ip,
                 is_wrap_swarm: false,
                 rc:[0.0, 0.0, 0.0, 0.0],//AETR
                 formation_class : {
@@ -156,7 +153,7 @@ class SwarmGCSUI {
             }
         });
 
-        this.threeview = new ThreeView(opt_3d);
+        this.threeview = new ThreeView(opt.opt_3d);
         this.threeview.ui = this;
 
         this.uav_local_poses = {};
@@ -285,17 +282,21 @@ class SwarmGCSUI {
         this.server_ip = _ip;
         this.view.server_ip = _ip;
         this.cmder.set_server_ip(_ip, true)
+        this.opt.server_ip = _ip;
+        this.update_opt_to_localstorage(this.opt);
     }
 
-    select_next_server_ip() {
-        console.log(this.server_ip_list.length);
-        this.server_ip_index = (this.server_ip_index + 1) % this.server_ip_list.length;
-        let _ip = this.server_ip_list[this.server_ip_index];
-        console.log("Select next ip " + _ip);
-        this.server_ip = _ip;
-        this.view.server_ip = _ip;
-        this.cmder.set_server_ip(_ip)
-        // this.set_server_ip(this.server_ip_list[this.server_ip_index])
+    update_opt_to_localstorage(opt) {
+        // If is nodejs mode, we should save the ip to "./config/config.json"
+        try {
+            console.log("Write config to file: ", opt);
+            require('fs').writeFileSync("./config/config.json", JSON.stringify(opt, null, 4));
+        } 
+        catch {
+            // Write to cookie instead
+            // TODO: Test write to cookie
+            console.log("Write config to cookie: ", opt);
+        }
     }
 
     update_drone_traj(ns, traj) {
