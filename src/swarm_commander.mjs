@@ -43,8 +43,7 @@ class SwarmCommander extends BaseCommander{
 
         this.ui.cmder = this;        
 
-        this.landing_speed = 0.2;
-        this.takeoff_speed = 0.6;
+        update_params(ui.opt);
 
         this.last_recv_pcl = tnow();
         this.pcl_duration = 0.3;
@@ -58,6 +57,10 @@ class SwarmCommander extends BaseCommander{
         this.vicon_subs = {}
 
         this.mission_update();
+    }
+
+    update_params (opt) {
+        this.opt = ui.opt;
     }
     
     sub_vicon_id(i) {
@@ -527,14 +530,14 @@ class SwarmCommander extends BaseCommander{
     send_takeoff_cmd(_id) {
         console.log("Will send takeoff command");
         let takeoff_cmd = 5;
-        let scmd = new mavlink.messages.swarm_remote_command (this.lps_time, _id,  takeoff_cmd, 10000, this.takeoff_speed*10000, 0, 0, 0, 0, 0, 0, 0, 0);
+        let scmd = new mavlink.messages.swarm_remote_command (this.lps_time, _id,  takeoff_cmd, this.opt.takeoff_height*10000, this.opt.takeoff_speed*10000, 0, 0, 0, 0, 0, 0, 0, 0);
         this.send_msg_to_swarm(scmd);
     }
 
     send_landing_cmd(_id) {
         console.log("Will send landing command");
         let landing_cmd = 6;
-        let scmd = new mavlink.messages.swarm_remote_command (this.lps_time, _id, landing_cmd, 0, this.landing_speed *10000, 0, 0, 0, 0, 0, 0, 0, 0);
+        let scmd = new mavlink.messages.swarm_remote_command (this.lps_time, _id, landing_cmd, 0, this.opt.landing_speed *10000, 0, 0, 0, 0, 0, 0, 0, 0);
         this.send_msg_to_swarm(scmd);
     }
 

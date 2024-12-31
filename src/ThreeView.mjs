@@ -312,7 +312,6 @@ class ThreeView {
     }
 
     init_postprocessing() {
-        console.log("Init post");
         let renderer = this.renderer;
         renderer.setPixelRatio(window.devicePixelRatio);
 
@@ -870,7 +869,7 @@ class ThreeView {
         this.scene.add( light );
 
         if (this.opt.chessboard) {
-            // this.add_chessboard();
+            this.add_chessboard();
         }
 
         if (this.opt.grid) {
