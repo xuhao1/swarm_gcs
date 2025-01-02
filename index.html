@@ -113,7 +113,7 @@
 </script>
 
 
-<body draggable="false"  ontouchstart=””>
+<body draggable="false"  ontouchstart="">
   <div id="urdf"></div>
   <div class="container-fluid" style="width: 100%" id="container">
 
@@ -136,18 +136,6 @@
             <a class="nav-link" href="#" v-bind:style="{ color: total_remote_color }">NODES: {{available_nodes}}/{{remote_nodes}}</a>
           </li>
          
-          <!--As we don't use vicon basically, disable this-->
-          <!-- <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-              aria-haspopup="true" aria-expanded="false">
-              DISPLAY:{{display_mode}}
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="#" v-on:click="set_display_mode_global">GLOBAL</a>
-              <a class="dropdown-item" href="#" v-on:click="set_display_mode_local">LOCAL</a>
-            </div>
-          </li> -->
-          
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
               aria-haspopup="true" aria-expanded="false">
