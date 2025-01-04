@@ -20,8 +20,8 @@ RUN bash -i -c "npm install -g http-server"
 #Build swarmtal_control
 RUN   mkdir -p ${SWARM_WS}/src/ && \
       cd ${SWARM_WS}/src/ && \
-      git clone https://github.com/HKUST-Swarm/swarm_msgs.git -b ros2 && \
-      git clone https://github.com/HKUST-Swarm/bspline.git -b ros2
+      git clone https://github.com/HKUST-Swarm/bspline.git -b ros2 && \
+      git clone https://github.com/HKUST-Swarm/swarm_msgs.git -b ros2
 
 RUN     . "/opt/ros/${ROS_VERSION}/setup.bash" && \
       cd ${SWARM_WS} && \

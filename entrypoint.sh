@@ -6,8 +6,6 @@ eval "$(/root/.local/share/fnm/fnm env --shell=bash)"
 echo "Launching with argument $1"
 if [ "$1" == "launch" ]; then
     echo "Launching GCS"
-    sudo ifconfig eth0 multicast
-    sudo route add -net 224.0.0.0 netmask 240.0.0.0 dev eth0
     ros2 launch rosbridge_server rosbridge_websocket_launch.xml &
     echo "Launching GCS UI"
     npm run web --prefix /swarm_gcs

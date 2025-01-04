@@ -64,88 +64,36 @@ class SwarmCommander extends BaseCommander{
     }
     
     sub_vicon_id(i) {
-        if (this.nodejs) {
-        }else{
-            console.log("subscribing vicon "+ i,  "/SwarmNode"+i+"/pose");
-            var vicon_sub = new ROSLIB.Topic({
-                ros: this.ros,
-                name: "/SwarmNode"+i+"/pose",
-                messageType: "geometry_msgs/PoseStamped"
-            });
-            
-            let _id = i;
-            let self = this;
-            this.vicon_subs[_id] = (vicon_sub);
-            vicon_sub.subscribe(function (incoming_msg) {
-                self.on_vicon_msg(_id, incoming_msg);
-            });
-        }
-    }
-
-    setup_ros_sub_pub_nodejs() {
-        console.log("setup_ros_sub_pub_nodejs");
-        const nh = this.nh;
+        console.log("subscribing vicon "+ i,  "/SwarmNode"+i+"/pose");
+        var vicon_sub = new ROSLIB.Topic({
+            ros: this.ros,
+            name: "/SwarmNode"+i+"/pose",
+            messageType: "geometry_msgs/PoseStamped"
+        });
+        
+        let _id = i;
         let self = this;
-
-        var sub_opts = {
-            queueSize: 100
-        };
-
-        this.sub_remote_nodes = nh.subscribe('/uwb_node/remote_nodes', 'swarmcomm_msgs/remote_uwb_info', (msg) => {
-            self.on_remote_nodes_info(msg);
-        }, sub_opts);
-
-        this.sub_grid = nh.subscribe('/expl_ground_node/grid', 'visualization_msgs/Marker', (msg) => {
-            self.on_grid(msg);
-        }, sub_opts);
-
-        this.sub_uwb_info = nh.subscribe('/uwb_node/remote_nodes', 'swarmcomm_msgs/remote_uwb_info', (msg) => {
-            self.on_remote_nodes_info(msg);
-        }, sub_opts);
-
-
-        this.bspine_viz_listener_1 = nh.subscribe("/planning/swarm_traj_recv", "bspline/Bspline", (msg) => {
-            if (msg.drone_id >= 0) {
-                self.ui.update_drone_traj_bspline(msg.drone_id, msg)
-            }
-        }, sub_opts);
-
-        this.bspine_viz_listener_2 = nh.subscribe("/planning/swarm_traj", "bspline/Bspline", (msg) => {
-            if (msg.drone_id >= 0) {
-                self.ui.update_drone_traj_bspline(msg.drone_id, msg)
-            }
-        }, sub_opts);
-
-
-        this.incoming_data_listener = nh.subscribe("/uwb_node/incoming_broadcast_data", "swarmcomm_msgs/incoming_broadcast_data", (msg) => {
-            self.on_incoming_data(msg);
-        }, sub_opts);
-
-
-        var sub_opts_pcl = {
-            queueSize: 1
-        };
-
-        this.sub_pcl = nh.subscribe('/sdf_map/occupancy_all_4', 'sensor_msgs/PointCloud2', (msg) => {
-            self.on_globalmap_recv(msg);
-        }, sub_opts_pcl);
-
-        this.sub_frontier = nh.subscribe("/expl_ground_node/frontier", 'sensor_msgs/PointCloud2', (msg) => {
-            self.on_frontier_recv(msg);
-        }, sub_opts_pcl);
-
-        var advertiste_opts = {
-            queueSize: 100
-        }
-
-        this.send_uwb_msg = nh.advertise('/uwb_node/send_broadcast_data', 'swarmcomm_msgs/data_buffer', advertiste_opts);
-
-        this.move_simple_goal = nh.advertise('/move_base_simple/goal', 'geometry_msgs/PoseStamped');
+        this.vicon_subs[_id] = (vicon_sub);
+        vicon_sub.subscribe(function (incoming_msg) {
+            self.on_vicon_msg(_id, incoming_msg);
+        });
     }
 
     setup_ros_sub_pub_websocket() {
         let ros = this.ros;
         let self = this;
+        
+        this.swarm_state_topic = new ROSLIB.Topic({
+            ros: ros,
+            name: "/swarm_commander_state",
+            messageType: "swarmtal_msgs/DroneCommanderState",
+            queue_length:1
+        });
+
+        this.swarm_state_topic.subscribe(function (msg) {
+            self.update_swarm_state(msg);
+        });
+
         this.remote_nodes_listener = new ROSLIB.Topic({
             ros: ros,
             name: "/uwb_node/remote_nodes",
@@ -279,7 +227,7 @@ class SwarmCommander extends BaseCommander{
             self.on_frontier_recv(msg);
         });
     }
-
+    
     setup_mavlink_on_udp(port=14550) {
         // Use UDP to receive mavlink message, setup the callback function
         // Setup UDP listener
@@ -308,6 +256,10 @@ class SwarmCommander extends BaseCommander{
         });
     }
            
+
+    update_swarm_state(msg) {
+        console.log(msg);
+    }
 
     on_grid(msg) {
         console.log(msg);
@@ -547,7 +499,7 @@ class SwarmCommander extends BaseCommander{
             var msg = {
                 header: {
                     frame_id: "world",
-                    stamp: this.rosnodejs.Time.now()
+                    stamp: ROSLIB.Date.now()
                 },
                 pose: {
                     position: {
@@ -564,19 +516,13 @@ class SwarmCommander extends BaseCommander{
                 }
             };
 
-            if (this.nodejs) {
-                this.move_simple_goal.publish(msg);
-            } else {
-                var _msg = new ROSLIB.Message(msg);
-                this.move_simple_goal.publish(_msg);
-            }
-
-            var exp_cmd = 30;
+            this.move_simple_goal.publish(msg);
         }
         catch(e){
             console.log(e);
         }
 
+        var exp_cmd = 30;
         let scmd = new mavlink.messages.swarm_remote_command (this.lps_time, _id, exp_cmd, 
             0, 
             0, 
@@ -668,20 +614,8 @@ class SwarmCommander extends BaseCommander{
     send_msg_to_swarm(_msg) {
         let _data = _msg.pack(this.mav);
         try {
-            if (this.nodejs) {
-                this.send_uwb_msg.publish({
-                    header: {
-                        frame_id: "world",
-                        stamp: this.rosnodejs.Time.now()
-                    },
-                    data : _data,
-                    send_method: 2,
-                });
-                console.log("Publishing via nodejs", _data);
-            } else {
-                var msg = new ROSLIB.Message({data : _data, send_method: 2});
-                this.send_uwb_msg.publish(msg);
-            }
+            var msg = new ROSLIB.Message({data : _data, send_method: 2});
+            this.send_uwb_msg.publish(msg);
         } catch (e) {
             console.log(e);
         }

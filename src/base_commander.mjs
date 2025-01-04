@@ -5,25 +5,8 @@ class BaseCommander {
       this.ui.cmder = this;        
 
       this.server_ip = this.ui.server_ip;
-      this.nodejs = false;
 
       console.log("Initializing commander")
-      try {
-        const rosnodejs = require('rosnodejs');
-        rosnodejs.loadAllPackages();
-        rosnodejs.initNode('/swarm_gcs');
-        this.rosnodejs = rosnodejs;
-        this.nh = rosnodejs.nh;
-        this.nodejs = true;
-        console.log("nodejs interface success!");
-        this.connected = true;
-        ui.set_ros_conn("Nodejs");
-        this.setup_ros_sub_pub_nodejs();
-      }
-      catch (e){
-        console.warn("Could not initialize rosnodejs:", e, "\n use websocket interface instead");
-        this.setup_ros_conn();
-      }
       try {
         this.setup_mavlink_on_udp(14550);
         ui.set_ros_conn("UDP");
@@ -32,11 +15,9 @@ class BaseCommander {
         console.warn("Could not initialize mavlink on udp", e);
       }
 
+      this.setup_ros_conn();
+      
       this.connected = false;
-  }
-
-  setup_ros_sub_pub_nodejs() {
-    console.log("Not implement yet");
   }
 
   setup_ros_sub_pub_websocket() {
