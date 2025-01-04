@@ -1,14 +1,14 @@
 #!/bin/bash
 # If argument1 is launch: to launch all nodes, else may in exec mode
 
-source /root/gcs_ws/devel/setup.bash
+source /root/gcs_ws/install/setup.bash
 eval "$(/root/.local/share/fnm/fnm env --shell=bash)"
 echo "Launching with argument $1"
 if [ "$1" == "launch" ]; then
     echo "Launching GCS"
     sudo ifconfig eth0 multicast
     sudo route add -net 224.0.0.0 netmask 240.0.0.0 dev eth0
-    roslaunch inf_uwb_ros uwb_node_gcs.launch &
+    ros2 launch rosbridge_server rosbridge_websocket_launch.xml &
     echo "Launching GCS UI"
     npm run web --prefix /swarm_gcs
     LOCAL_IP=$(hostname -I)

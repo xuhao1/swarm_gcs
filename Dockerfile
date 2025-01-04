@@ -1,6 +1,6 @@
-FROM ros:noetic-perception-focal
+FROM ros:iron-perception
 
-ARG ROS_VERSION=noetic
+ARG ROS_VERSION=iron
 ARG SWARM_WS=/root/gcs_ws
 ARG NODEJS_VERSION=23
 
@@ -17,24 +17,15 @@ RUN bash -i -c "fnm install ${NODEJS_VERSION} && fnm use ${NODEJS_VERSION}" && \
 
 RUN bash -i -c "npm install -g http-server"
 
-#Install LCM
-RUN   git clone https://github.com/lcm-proj/lcm && \
-      cd lcm && \
-      git checkout tags/v1.4.0 && \
-      mkdir build && cd build && \
-      cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DBUILD_BENCHMARKS=OFF .. && \
-      make -j$(nproc) install
-
 #Build swarmtal_control
 RUN   mkdir -p ${SWARM_WS}/src/ && \
       cd ${SWARM_WS}/src/ && \
-      git clone https://github.com/HKUST-Swarm/swarm_msgs.git -b D2SLAM && \
-      git clone https://github.com/HKUST-Swarm/bspline && \
-      git clone https://github.com/HKUST-Swarm/inf_uwb_ros.git
+      git clone https://github.com/HKUST-Swarm/swarm_msgs.git -b ros2 && \
+      git clone https://github.com/HKUST-Swarm/bspline.git -b ros2
 
 RUN     . "/opt/ros/${ROS_VERSION}/setup.bash" && \
-        cd ${SWARM_WS} && \
-        catkin_make -DCMAKE_BUILD_TYPE=Release
+      cd ${SWARM_WS} && \
+      colcon build
 
 WORKDIR /swarm_gcs
 COPY ./ /swarm_gcs/

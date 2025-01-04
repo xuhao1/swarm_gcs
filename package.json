@@ -22,10 +22,12 @@
     "electron": "^16.2.8",
     "jspack": "^0.0.4",
     "rosnodejs": "^3.0.2",
-    "underscore": "^1.9.1"
+    "underscore": "^1.9.1",
+    "webpack-cli": "^6.0.1"
   },
   "dependencies": {
     "jspack": "^0.0.4",
+    "roslib": "^1.4.1",
     "rosnodejs": "^3.0.2",
     "three": "^0.170.0",
     "underscore": "^1.9.1"
