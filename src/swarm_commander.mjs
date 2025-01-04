@@ -43,7 +43,7 @@ class SwarmCommander extends BaseCommander{
 
         this.ui.cmder = this;        
 
-        update_params(ui.opt);
+        this.update_params(ui.opt);
 
         this.last_recv_pcl = tnow();
         this.pcl_duration = 0.3;
@@ -60,7 +60,7 @@ class SwarmCommander extends BaseCommander{
     }
 
     update_params (opt) {
-        this.opt = ui.opt;
+        this.opt = opt;
     }
     
     sub_vicon_id(i) {
