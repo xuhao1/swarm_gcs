@@ -516,13 +516,13 @@ class SwarmGCSUI {
 
         let obj = this;
         Vue.set(this.view.uavs, _id, {
-            x:toFixedString(status.x, 2),
-            y:toFixedString(status.y, 2),
-            z:toFixedString(status.z, 2),
+            x:toFixedString(status.pos.x, 2),
+            y:toFixedString(status.pos.y, 2),
+            z:toFixedString(status.pos.z, 2),
             bat_vol:status.bat_vol.toFixed(2),
             ctrl_auth:ctrl_auths[status.control_auth],
-            ctrl_mode:ctrl_modes[status.commander_mode],
-            ctrl_input_mode:ctrl_input_mode[status.input_mode],
+            ctrl_mode:ctrl_modes[status.commander_ctrl_mode],
+            ctrl_input_mode:ctrl_input_mode[status.ctrl_input_state],
             flight_status:all_flight_status[status.flight_status],
             vo_valid:status.vo_valid,
             lps_time:status.lps_time,
