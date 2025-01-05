@@ -72,19 +72,23 @@ class UAVCommander {
     }
 
     send_command(cmd) {
+        console.log("Sending command to drone: " + this.drone_id, "cmd: ", cmd);
         this.cmd_pub.publish(cmd);
     }
 
-    send_takeoff_cmd(height) {
-        console.log("Sending takeoff command to drone: " + this.drone_id + " height: " + height, "opt: ", this.opt);
+    send_takeoff_cmd(height, takeoff_speed) {
+        console.log("Sending takeoff command to drone: " + this.drone_id + " height: " + height);
         let cmd = generateCommand(CommanderDefines.CTRL_TAKEOF_COMMAND,
-            this.opt.source_id, this.drone_id, Math.round(height*10000));
+            this.opt.source_id, this.drone_id, Math.round(height*10000),
+                Math.round(takeoff_speed*10000));
         this.send_command(cmd);
     }
 
-    send_landing_cmd(landing_speed) {
+    send_landing_cmd(landing_speed, is_emergency = false) {
+        let param1 = is_emergency ? 1 : 0;
+        console.log("Sending landing command to drone: " + this.drone_id + " landing_speed: " + landing_speed);
         let cmd = generateCommand(CommanderDefines.CTRL_LANDING_COMMAND,
-            this.opt.source_id, this.drone_id, Math.round(landing_speed*10000));
+            this.opt.source_id, this.drone_id, param1, Math.round(landing_speed*10000));
         this.send_command(cmd);
     }
 }

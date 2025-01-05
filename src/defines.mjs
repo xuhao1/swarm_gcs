@@ -1,40 +1,30 @@
 class CommanderDefines {
-    constructor() {
-        this.CTRL_POS_COMMAND=0
-        this.CTRL_VEL_COMMAND=1
-        this.CTRL_ATT_COMMAND=2
-        this.CTRL_MISSION_LOAD_COMMAND=3
-        this.CTRL_MISSION_END_COMMAND=4
-        this.CTRL_TAKEOF_COMMAND=5
-        this.CTRL_LANDING_COMMAND=6
-        this.CTRL_HOVER_COMMAND=7
-        this.CTRL_ARM_COMMAND=8
-
-        this.CTRL_PLANING_TGT_COMMAND=10
-
-        this.CTRL_FORMATION_IDLE=11
-
-        // Passive hold in master's local frame
-        this.CTRL_FORMATION_HOLD_0=12
-
-        // Passive hold in master's natural frame
-        this.CTRL_FORMATION_HOLD_1=13
-
-        // Activate fly in master's local frame
-        this.CTRL_FORMATION_FLY_0=14
-
-        // Activate fly master's natural frame
-        this.CTRL_FORMATION_FLY_1=15
-
-        this.CTRL_SPEC_TRAJS=16
-        this.CTRL_MISSION_TRAJS=20
-
-        this.CTRL_TASK_EXPROLARATION=30
-
-        this.CTRL_END_MISSION=99
-    }
-
 }
+
+CommanderDefines.CTRL_POS_COMMAND=0
+CommanderDefines.CTRL_VEL_COMMAND=1
+CommanderDefines.CTRL_ATT_COMMAND=2
+CommanderDefines.CTRL_MISSION_LOAD_COMMAND=3
+CommanderDefines.CTRL_MISSION_END_COMMAND=4
+CommanderDefines.CTRL_TAKEOF_COMMAND=5
+CommanderDefines.CTRL_LANDING_COMMAND=6
+CommanderDefines.CTRL_HOVER_COMMAND=7
+CommanderDefines.CTRL_ARM_COMMAND=8
+CommanderDefines.CTRL_PLANING_TGT_COMMAND=10
+CommanderDefines.CTRL_FORMATION_IDLE=11
+// Passive hold in master's local frame
+CommanderDefines.CTRL_FORMATION_HOLD_0=12
+// Passive hold in master's natural frame
+CommanderDefines.CTRL_FORMATION_HOLD_1=13
+// Activate fly in master's local frame
+CommanderDefines.CTRL_FORMATION_FLY_0=14
+// Activate fly master's natural frame
+CommanderDefines.CTRL_FORMATION_FLY_1=15
+CommanderDefines.CTRL_SPEC_TRAJS=16
+CommanderDefines.CTRL_MISSION_TRAJS=20
+CommanderDefines.CTRL_TASK_EXPROLARATION=30
+CommanderDefines.CTRL_END_MISSION=99
+
 
 function generateCommand(command_type, source_id = -1, target_id = -1, param1 = 0, param2 = 0, param3 = 0, param4 = 0, param5 = 0, param6 = 0, param7 = 0, param8 = 0, param9 = 0, param10 = 0) {
     return {

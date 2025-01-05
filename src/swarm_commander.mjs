@@ -428,30 +428,37 @@ class SwarmCommander extends BaseCommander{
     }
 
     send_takeoff_cmd(_id) {
+        let uav_opt = this.opt.uav;
         if (_id < 0) {
             // TODO: broadcast instead of sending to each drone
             for (var id_drone in this.uav_commanders) {
-                this.uav_commanders[id_drone].send_takeoff_cmd(this.opt.takeoff_height);
+                this.uav_commanders[id_drone].send_takeoff_cmd(uav_opt.takeoff_height, uav_opt.takeoff_speed);
             }
         }
         else
         {
-            this.uav_commanders[_id].send_takeoff_cmd(this.opt.takeoff_height);
+            this.uav_commanders[_id].send_takeoff_cmd(uav_opt.takeoff_height,  uav_opt.takeoff_speed);
         }
     }
 
-    send_landing_cmd(_id) {
+    send_landing_cmd(_id, is_emergency=false) {
+        let uav_opt = this.opt.uav;
         if (_id < 0) 
         {
             // TODO: broadcast instead of sending to each drone
             for (var id_drone in this.uav_commanders) {
-                this.uav_commanders[id_drone].send_landing_cmd(this.opt.landing_speed);
+                this.uav_commanders[id_drone].send_landing_cmd(uav_opt.landing_speed, is_emergency);
             }
         }
         else
         {
-            this.uav_commanders[_id].send_landing_cmd();
+            this.uav_commanders[_id].send_landing_cmd(uav_opt.landing_speed, is_emergency);
         }
+    }
+
+    send_emergency_cmd() {
+        console.log("Will send emergency command");
+        this.send_landing_cmd(-1, true);
     }
 
     send_simple_move(_id){
@@ -522,13 +529,6 @@ class SwarmCommander extends BaseCommander{
             Math.floor(pos.x*10000), 
             Math.floor(pos.y*10000), 
             Math.floor(pos.z*10000), 0, 0, 0, 0, 0, 0, 0);
-        this.send_msg_to_swarm(scmd);
-    }
-
-    send_emergency_cmd() {
-        console.log("Will send emergency command");
-        let landing_cmd = 6;
-        let scmd = new mavlink.messages.swarm_remote_command (this.lps_time, -1, landing_cmd, -1, 5000, 0, 0, 0, 0, 0, 0, 0, 0);
         this.send_msg_to_swarm(scmd);
     }
 
