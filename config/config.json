@@ -6,5 +6,10 @@
     "server_ip": "127.0.0.1",
     "landing_speed": 0.2,
     "takeoff_speed": 0.6,
-    "takeoff_height": 1.5
+    "takeoff_height": 1.5,
+    "source_id": 1,
+    "uav": {
+        "odom_topic": "mavros/odometry/in_correct",
+        "command_topic": "drone_commander/onboard_command"
+    }
 }

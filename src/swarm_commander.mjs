@@ -1,5 +1,6 @@
 import * as THREE from "../third_party/three.js/build/three.webgpu.js";
 import {BaseCommander} from "./base_commander.mjs"
+import {UAVCommander} from "./uav_commander.mjs"
 import {PointCloud2} from './pointcloud2.mjs';
 import {formations, generate_random_formation} from './formations.mjs';
 
@@ -52,9 +53,7 @@ class SwarmCommander extends BaseCommander{
         
         this.missions = {}
 
-        this.uav_pos = {}
-
-        this.vicon_subs = {}
+        this.uav_commanders = {};
 
         this.mission_update();
     }
@@ -63,22 +62,6 @@ class SwarmCommander extends BaseCommander{
         this.opt = opt;
     }
     
-    sub_vicon_id(i) {
-        console.log("subscribing vicon "+ i,  "/SwarmNode"+i+"/pose");
-        var vicon_sub = new ROSLIB.Topic({
-            ros: this.ros,
-            name: "/SwarmNode"+i+"/pose",
-            messageType: "geometry_msgs/PoseStamped"
-        });
-        
-        let _id = i;
-        let self = this;
-        this.vicon_subs[_id] = (vicon_sub);
-        vicon_sub.subscribe(function (incoming_msg) {
-            self.on_vicon_msg(_id, incoming_msg);
-        });
-    }
-
     setup_ros_sub_pub_websocket() {
         let ros = this.ros;
         let self = this;
@@ -258,7 +241,12 @@ class SwarmCommander extends BaseCommander{
            
 
     update_swarm_state(msg) {
-        this.on_drone_status_recv(msg.drone_id, 0, msg);
+        // Check if UAV is created in this.uavs
+        let drone_id = msg.drone_id;
+        if (!this.uav_commanders[drone_id]) {
+            this.uav_commanders[drone_id] = new UAVCommander(drone_id, this.ros, this.ui, this.opt);
+        }
+        this.uav_commanders[drone_id].on_drone_status_recv(msg);
     }
 
     on_grid(msg) {
@@ -307,17 +295,6 @@ class SwarmCommander extends BaseCommander{
         this.ui.update_inc_pcl(pcl);
     }
  
-    on_vicon_msg(_id, msg) {
-        // msg.qua
-        var euler = new THREE.Euler(0, 2.34, 0);
-
-        let _q = msg.pose.orientation;
-        var quat = new THREE.Quaternion(_q.x, _q.y, _q.z, _q.w);
-        var pos = new THREE.Vector3(msg.pose.position.x, msg.pose.position.y, msg.pose.position.z);
-
-        this.ui.update_drone_globalpose(_id, pos, quat);
-    }
-
     on_incoming_data(incoming_msg) {
         if (!vaild_ids.has(incoming_msg.remote_id)) {
             return;
@@ -409,43 +386,14 @@ class SwarmCommander extends BaseCommander{
         this.ui.set_self_id(msg.self_id);
     }
 
-    on_drone_status_recv(_id, lps_time, status) {
-        if (! (_id in this.vicon_subs) && this.ui.global_local_mode ) {
-            this.sub_vicon_id(_id);
-        }
 
-        this.ui.set_drone_status(_id, status)
-
-        var pos = new THREE.Vector3(status.pos.x, status.pos.y, status.pos.z);
-        var quat = new THREE.Quaternion();
-        quat.setFromEuler(new THREE.Euler(0, 0, status.yaw));
-        this.ui.update_drone_selfpose(_id, pos, quat, 0, 0, 0);
-        this.uav_pos[_id] = pos;
-        this.ui.update_reference_frame(_id, 1); //Temp code
-    }
 
     t_last = {
         "1":0,
         "2":0
     }
 
-    on_drone_realtime_info_recv(_id, lps_time, info) {
-        // console.log(info);
-        var pos = new THREE.Vector3(info.x, info.y, info.z);
-        var quat = new THREE.Quaternion();
-        quat.setFromEuler(new THREE.Euler(info.roll/1000.0, info.pitch/1000.0, info.yaw/1000.0));
-        this.ui.update_drone_selfpose(_id, pos, quat, info.vx/100.0, info.vy/100.0, info.vz/100.0);
-        this.uav_pos[_id] = pos;
-        // this.t_last[_id] = info.lps_time;
-    }
-
-    on_drone_odom(_id, lps_time, msg) {
-        var pos = new THREE.Vector3(msg.x/1000.0, msg.y/1000.0, msg.z/1000.0);
-        var att = new THREE.Quaternion(msg.q1/10000.0, msg.q2/10000.0, msg.q3/10000.0, msg.q0/10000.0);
-        this.ui.update_drone_selfpose(_id, pos, att, msg.vx/1000.0, msg.vy/1000.0, msg.vz/1000.0);
-        this.uav_pos[_id] = pos;
-    }
-
+    
     on_swarm_drone_fused(msg) {
         // console.log(msg);
         for (var i = 0; i< msg.ids.length; i ++) {
@@ -480,17 +428,30 @@ class SwarmCommander extends BaseCommander{
     }
 
     send_takeoff_cmd(_id) {
-        console.log("Will send takeoff command");
-        let takeoff_cmd = 5;
-        let scmd = new mavlink.messages.swarm_remote_command (this.lps_time, _id,  takeoff_cmd, this.opt.takeoff_height*10000, this.opt.takeoff_speed*10000, 0, 0, 0, 0, 0, 0, 0, 0);
-        this.send_msg_to_swarm(scmd);
+        if (_id < 0) {
+            // TODO: broadcast instead of sending to each drone
+            for (var id_drone in this.uav_commanders) {
+                this.uav_commanders[id_drone].send_takeoff_cmd(this.opt.takeoff_height);
+            }
+        }
+        else
+        {
+            this.uav_commanders[_id].send_takeoff_cmd(this.opt.takeoff_height);
+        }
     }
 
     send_landing_cmd(_id) {
-        console.log("Will send landing command");
-        let landing_cmd = 6;
-        let scmd = new mavlink.messages.swarm_remote_command (this.lps_time, _id, landing_cmd, 0, this.opt.landing_speed *10000, 0, 0, 0, 0, 0, 0, 0, 0);
-        this.send_msg_to_swarm(scmd);
+        if (_id < 0) 
+        {
+            // TODO: broadcast instead of sending to each drone
+            for (var id_drone in this.uav_commanders) {
+                this.uav_commanders[id_drone].send_landing_cmd(this.opt.landing_speed);
+            }
+        }
+        else
+        {
+            this.uav_commanders[_id].send_landing_cmd();
+        }
     }
 
     send_simple_move(_id){
@@ -640,10 +601,13 @@ class SwarmCommander extends BaseCommander{
             return;
         }
         if (origin == null) {
-            origin = {
-                x:this.uav_pos[_id].x,
-                y:this.uav_pos[_id].y + r,
-                z:this.uav_pos[_id].z
+            if (_id in this.uav_commanders) {
+                var pos = this.uav_commanders[_id].pos;
+                origin = {
+                    x:this.pos.x,
+                    y:this.pos.y + r,
+                    z:this.pos.z
+                }
             }
         }
 
