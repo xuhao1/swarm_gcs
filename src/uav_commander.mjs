@@ -86,9 +86,23 @@ class UAVCommander {
 
     send_landing_cmd(landing_speed, is_emergency = false) {
         let param1 = is_emergency ? 1 : 0;
-        console.log("Sending landing command to drone: " + this.drone_id + " landing_speed: " + landing_speed);
         let cmd = generateCommand(CommanderDefines.CTRL_LANDING_COMMAND,
             this.opt.source_id, this.drone_id, param1, Math.round(landing_speed*10000));
+        this.send_command(cmd);
+    }
+
+    send_flyto_cmd(pos, use_planner = false, yaw_ff = null, vel_ff = null, acc_ff = null) {
+        let cmd_type = use_planner ? CommanderDefines.CTRL_PLANING_TGT_COMMAND : CommanderDefines.CTRL_POS_COMMAND;
+        let vel_ff_x_int = vel_ff ? Math.round(vel_ff.x*10000) : 0;
+        let vel_ff_y_int = vel_ff ? Math.round(vel_ff.y*10000) : 0;
+        let vel_ff_z_int = vel_ff ? Math.round(vel_ff.z*10000) : 0;
+        let acc_ff_x_int = acc_ff ? Math.round(acc_ff.x*10000) : 0;
+        let acc_ff_y_int = acc_ff ? Math.round(acc_ff.y*10000) : 0;
+        let acc_ff_z_int = acc_ff ? Math.round(acc_ff.z*10000) : 0;
+        let yaw_ff_int = yaw_ff ? Math.round(yaw_ff*1000) : CommanderDefines.YAW_KEEP;
+        let cmd = generateCommand(cmd_type,
+            this.opt.source_id, this.drone_id, Math.round(pos.x*10000), Math.round(pos.y*10000), Math.round(pos.z*10000),
+            yaw_ff_int, vel_ff_x_int, vel_ff_y_int, vel_ff_z_int, acc_ff_x_int, acc_ff_y_int, acc_ff_z_int);
         this.send_command(cmd);
     }
 }

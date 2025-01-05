@@ -336,7 +336,7 @@ class SwarmGCSUI {
         this.threeview.clear_drone_trajs();
     }
 
-    send_flyto_cmd(_id, direct) {
+    send_flyto_cmd(_id, use_planner) {
         let pos = { 
             x: 0,
             y: 0,
@@ -360,7 +360,7 @@ class SwarmGCSUI {
                 pos.y = dy + this.uav_local_poses[_id].y;
                 pos.z = dz + this.uav_local_poses[_id].z;
 
-                this.cmder.send_flyto_cmd(_id, pos, direct);
+                this.cmder.send_flyto_cmd(_id, pos, use_planner);
             }
         } else {
             if( _id == this.primary_id) {
@@ -369,13 +369,13 @@ class SwarmGCSUI {
                 pos.y = t_pos.y;
                 pos.z = t_pos.z;
                 console.log("Sending...");
-                this.cmder.send_flyto_cmd(_id, pos, direct);
+                this.cmder.send_flyto_cmd(_id, pos, use_planner);
             } else if (_id == -1) {
                 pos.x = t_pos.x;
                 pos.y = t_pos.y;
                 pos.z = t_pos.z;
                 console.log("Send all formation command", pos);
-                this.cmder.formation_flyto(pos, direct);
+                this.cmder.formation_flyto(pos, use_planner);
             } else {
                 var ret = this.transfer_vo_with_based(this.uav_local_poses[_id].pos, this.uav_local_poses[_id].quat, _id, this.primary_id);
                 var _pos = ret.pos;
@@ -388,13 +388,14 @@ class SwarmGCSUI {
                 pos.y = dy + this.uav_local_poses[_id].pos.y;
                 pos.z = dz + this.uav_local_poses[_id].pos.z;
                 // console.log("Send fly to", pos);
-                this.cmder.send_flyto_cmd(_id, pos, direct);
+                this.cmder.send_flyto_cmd(_id, pos, use_planner);
             }
         }
 
     }
 
     send_command(_cmd) {
+        let uav_opt = this.opt.uav;
         if (_cmd == "takeoff") {
             if (!confirm('Takeoff; Right? ID'+this.select_id)) {
                 return;
@@ -411,13 +412,10 @@ class SwarmGCSUI {
                 this.cmder.send_emergency_cmd(this.select_id);
                 break;
             case "circle":
-                this.cmder.start_circle_fly(this.select_id, null, 1.5, 20, "follow");
+                this.cmder.start_circle_fly(this.select_id, null, uav_opt.circle_radius, uav_opt.circle_T, "follow");
                 break;
             case "flyto":
-                this.send_flyto_cmd(this.select_id, 1);
-                break;
-            case "flyto_traj":
-                this.send_flyto_cmd(this.select_id, 0);
+                this.send_flyto_cmd(this.select_id, uav_opt.use_planner);
                 break;
             case "traj0":
                 this.cmder.send_traj_cmd(this.select_id, 0);
@@ -841,9 +839,6 @@ class SwarmGCSUI {
                     cmd = "飞向";
                     break;
                 case "flyto":
-                    cmd = "飞向";
-                    break;
-                case "flyto_traj":
                     cmd = "飞向";
                     break;
                 case "circle":

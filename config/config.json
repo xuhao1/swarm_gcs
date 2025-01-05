@@ -10,6 +10,10 @@
         "command_topic": "drone_commander/onboard_command",
         "landing_speed": 0.2,
         "takeoff_speed": 0.6,
-        "takeoff_height": 1.5
+        "takeoff_height": 1.5,
+        "use_planner": false,
+
+        "circle_radius": 1.0,
+        "circle_T": 10.0
     }
 }

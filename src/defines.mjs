@@ -24,6 +24,7 @@ CommanderDefines.CTRL_SPEC_TRAJS=16
 CommanderDefines.CTRL_MISSION_TRAJS=20
 CommanderDefines.CTRL_TASK_EXPROLARATION=30
 CommanderDefines.CTRL_END_MISSION=99
+CommanderDefines.YAW_KEEP=666666
 
 
 function generateCommand(command_type, source_id = -1, target_id = -1, param1 = 0, param2 = 0, param3 = 0, param4 = 0, param5 = 0, param6 = 0, param7 = 0, param8 = 0, param9 = 0, param10 = 0) {

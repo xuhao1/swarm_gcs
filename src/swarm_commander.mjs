@@ -456,6 +456,22 @@ class SwarmCommander extends BaseCommander{
         }
     }
 
+    send_flyto_cmd(_id, pos, use_planner) {
+        //When use VO coordinates
+        console.log("Fly to ", pos, "use_planner", use_planner);
+        if (_id < 0) 
+        {
+            // TODO: broadcast instead of sending to each drone
+            for (var id_drone in this.uav_commanders) {
+                this.uav_commanders[id_drone].send_flyto_cmd(pos, use_planner);
+            }
+        }
+        else
+        {
+            this.uav_commanders[_id].send_flyto_cmd(pos, use_planner);
+        }
+    }
+
     send_emergency_cmd() {
         console.log("Will send emergency command");
         this.send_landing_cmd(-1, true);
@@ -495,40 +511,6 @@ class SwarmCommander extends BaseCommander{
             0, 
             0, 
             0, 0, 0, 0, 0, 0, 0, 0);
-        this.send_msg_to_swarm(scmd);
-    }
-
-    send_flyto_cmd(_id, pos, direct) {
-        //When use VO coordinates
-        console.log("Fly to ", pos, "is direct", direct);
-
-        // var msg = new ROSLIB.Message({
-        //     pose: {
-        //         position: {
-        //             x: pos.x,
-        //             y: pos.y,
-        //             z: pos.z,
-        //         },
-        //         orientation: {
-        //             w: 1,
-        //             x: 0, 
-        //             y: 0, 
-        //             z: 0
-        //         }
-        //     }
-        // });
-
-        // this.move_simple_goal.publish(msg);
-
-        var flyto_cmd = 0;
-
-        if (! direct) {
-            flyto_cmd = 10;
-        }
-        let scmd = new mavlink.messages.swarm_remote_command (this.lps_time, _id, flyto_cmd, 
-            Math.floor(pos.x*10000), 
-            Math.floor(pos.y*10000), 
-            Math.floor(pos.z*10000), 0, 0, 0, 0, 0, 0, 0);
         this.send_msg_to_swarm(scmd);
     }
 
@@ -604,9 +586,9 @@ class SwarmCommander extends BaseCommander{
             if (_id in this.uav_commanders) {
                 var pos = this.uav_commanders[_id].pos;
                 origin = {
-                    x:this.pos.x,
-                    y:this.pos.y + r,
-                    z:this.pos.z
+                    x:pos.x,
+                    y:pos.y + r,
+                    z:pos.z
                 }
             }
         }
@@ -634,7 +616,6 @@ class SwarmCommander extends BaseCommander{
 
     circle_mission(_id, mission, _tnow) {
         // console.log("circle mission");
-        let flyto_cmd = 0;
         var t = _tnow - mission.ts;
         var r = mission.r;
         var yaw_mode = mission.yaw_mode;
@@ -646,29 +627,21 @@ class SwarmCommander extends BaseCommander{
         var pi = Math.PI;
         var x = ox + Math.sin(t*pi*2/T)*r;
         var y = oy - Math.cos(t*pi*2/T)*r;
+        let pos = new THREE.Vector3(x, y, oz);
         var vx = Math.cos(t*pi*2/T) * r * pi*2/T;
         var vy = Math.sin(t*pi*2/T) * r * pi*2/T;
+        let vel = new THREE.Vector3(vx, vy, 0);
         var ax = - Math.sin(t*pi*2/T) * r * pi*2/T * pi*2/T;
         var ay = Math.cos(t*pi*2/T) * r * pi*2/T * pi*2/T;
-        // console.log(x, y, oz);
-
-        var param1 = Math.floor(x*10000)
-        var param2 = Math.floor(y*10000)
-        var param3 = Math.floor(oz*10000)
-        var param5 = Math.floor(vx*10000)
-        var param6 = Math.floor(vy*10000)
-        var param7 = 0
-        var param4 = 666666;
-        if (yaw_mode == "follow") {
-            param4 = Math.floor(-t*pi*2*10000/T);
+        let acc = new THREE.Vector3(ax, ay, 0);
+        let yaw_ff = yaw_mode == "follow" ? -t*pi*2*10000/T: null;
+        if ( _id in this.uav_commanders) {
+            this.uav_commanders[_id].send_flyto_cmd(pos, false, yaw_ff, vel, acc);
         }
-        var param8 = Math.floor(ax*10000)
-        var param9 = Math.floor(ay*10000)
-
-        let scmd = new mavlink.messages.swarm_remote_command (this.lps_time, _id, flyto_cmd, 
-            param1, param2, param3, param4, 
-            param5, param6, param7, param8, param9, 0);
-        this.send_msg_to_swarm(scmd);
+        else 
+        {
+            console.warn("No such drone id", _id);
+        }
     }
 
     mission_update() {
@@ -688,7 +661,7 @@ class SwarmCommander extends BaseCommander{
         }, 30);
     }
 
-    formation_flyto(pos) {
+    formation_flyto(pos, with_planner=false) {
         if (this.current_formation < 0) {
             return;
         }

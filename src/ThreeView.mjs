@@ -528,9 +528,8 @@ class ThreeView {
             pos.z += z_off;
             this.create_aircraft_waypoint(this.ui.select_id, pos);
             if (fire) {
-                // console.log("x: " + pos.x + ", y: " + pos.y + ", z:", pos.z);
                 if (this.ui.flyto_mode) {
-                    this.ui.send_command("flyto_traj");
+                    this.ui.send_command("flyto");
                 }
             }
         }
